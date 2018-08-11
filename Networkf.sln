@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Networkf", "Networkf\Networkf.csproj", "{CBDC55E6-4342-499E-9005-A9FEB17AC397}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkfSample", "NetworkfSample\NetworkfSample.csproj", "{B3E35D08-0AFF-4EAF-8F55-21B6C7BCD16B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B3E35D08-0AFF-4EAF-8F55-21B6C7BCD16B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3E35D08-0AFF-4EAF-8F55-21B6C7BCD16B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B3E35D08-0AFF-4EAF-8F55-21B6C7BCD16B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B3E35D08-0AFF-4EAF-8F55-21B6C7BCD16B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CBDC55E6-4342-499E-9005-A9FEB17AC397}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CBDC55E6-4342-499E-9005-A9FEB17AC397}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CBDC55E6-4342-499E-9005-A9FEB17AC397}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CBDC55E6-4342-499E-9005-A9FEB17AC397}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
