@@ -57,8 +57,8 @@ namespace NetworkfSample {
 			service.SendMessage(new CltSetNameMessage(name));
 
 			Console.WriteLine("Happy chating, " + name + "!");
-			string text = Console.ReadLine();
 			while (true) {
+				string text = Console.ReadLine();
 				service.SendMessage(new CltChatMessage(text));
 			}
 		}

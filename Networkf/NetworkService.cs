@@ -39,7 +39,7 @@ namespace Networkf {
 					Log("net: new client {0}", clientIndex);
 					var service = new NetworkService(clientIndex, client);
 					if (onClientConnected != null) {
-						onClientConnected(service);
+						new Thread(() => onClientConnected(service)).Start();
 					}
 
 					clientIndex += 1;
