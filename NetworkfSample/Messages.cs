@@ -15,8 +15,8 @@ namespace NetworkfSample {
 		public const int KType = 1;
 		public readonly string name;
 
-		public CltSetNameMessage(string text) : base(KType) {
-			this.name = text;
+		public CltSetNameMessage(string name) : base(KType) {
+			this.name = name;
 		}
 
 		/**

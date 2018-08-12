@@ -9,9 +9,10 @@ namespace NetworkfSample {
 			var option = System.Console.ReadLine();
 			if (option.Length > 0 && option[0] == 's') {
 				var server = new SampleServer();
-				NetworkService.StartServer(server.OnClientConnected);
+				NetworkHelper.StartServer(server.OnClientConnected);
+				System.Console.ReadLine();
 			} else {
-				var service = NetworkService.StartClient();
+				var service = NetworkHelper.StartClient();
 				var client = new SampleClient(service);
 				client.Start();
 			}
