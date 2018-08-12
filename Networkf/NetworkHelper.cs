@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Networkf {
@@ -19,10 +20,10 @@ namespace Networkf {
 		public static void StartServer(System.Action<NetworkService> onClientConnected = null, int port = KServerPort) {
 			var ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
 			var ipAddress = ipHostInfo.AddressList[0];
-			var localEndPoint = new IPEndPoint(ipAddress, port);
+			var localTcpEp = new IPEndPoint(ipAddress, port);
 
 			var server = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-			server.Bind(localEndPoint);
+			server.Bind(localTcpEp);
 			server.Listen(10);  // backlog is 10
 
 			int clientIndex = 0;
@@ -33,22 +34,47 @@ namespace Networkf {
 					var client = server.Accept();
 					
 					Log("new client " + clientIndex);
-					Task.Run(() => {
-						var service = new NetworkService(clientIndex, client);
+					new Thread(() => {
+						var udpClient = new Socket(ipAddress.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
+						udpClient.Bind(new IPEndPoint(ipAddress, 0));
+
+						var service = new NetworkService(clientIndex, client, udpClient, localTcpEp, client.RemoteEndPoint as IPEndPoint, udpClient.LocalEndPoint as IPEndPoint);
+
 						/**
 						 * => serHeader              6 "NfSer1"
 						 * => serUdpPort             2 uint16
 						 * <= cliHeader              6 "NfCli1"
-						 * <= byteCount              1 uint8
-						 * <= cliLocalAddr <byteCount> string
 						 * <= cliTcpPort             2 uint16
 						 * <= cliUdpPort             2 uint16
+						 * <= byteCount              1 uint8
+						 * <= cliLocalAddr <byteCount> string
 						 */
+						int i = 0;
+						BitHelper.WriteString(service.bufferSnd, ref i, "NfSer1");
+						BitHelper.WriteUInt16(service.bufferSnd, ref i, (ushort)(udpClient.LocalEndPoint as IPEndPoint).Port);
+						service.Send(0, i);
+						Log(i.ToString());
+						service.Receive(0, 11);
+						i = 0;
+						string cliHeader = BitHelper.ReadString(service.bufferRev, ref i, 6);
+						Log(cliHeader);
+						int cliTcpPort = BitHelper.ReadUInt16(service.bufferRev, ref i);
+						int cliUdpPort = BitHelper.ReadUInt16(service.bufferRev, ref i);
+						int byteCount = BitHelper.ReadUInt8(service.bufferRev, ref i);
+						service.Receive(i, byteCount);
+						string cliLocalAddrStr = BitHelper.ReadString(service.bufferRev, ref i, byteCount);
+						Log(cliLocalAddrStr);
+						var cliLocalAddr = IPAddress.Parse(cliLocalAddrStr);
+						var remoteUdpEp = new IPEndPoint((client.RemoteEndPoint as IPEndPoint).Address, cliUdpPort);
+						udpClient.Connect(remoteUdpEp);
+						service.SetRemoteUdpEp(remoteUdpEp);
+
 						Task.Run((System.Action)service.MessageListener);
+
 						if (onClientConnected != null) {
 							onClientConnected(service);
 						}
-					});
+					}).Start();
 					
 					clientIndex += 1;
 				}
@@ -62,16 +88,37 @@ namespace Networkf {
 
 			var socket = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 			socket.Connect(remoteEndPoint);
-			var service = new NetworkService(-1, socket);
+			var udpSocket = new Socket(ipAddress.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
+			udpSocket.Bind(new IPEndPoint(ipAddress, 0));
+
+			var service = new NetworkService(-1, socket, udpSocket, socket.LocalEndPoint as IPEndPoint, socket.RemoteEndPoint as IPEndPoint, udpSocket.LocalEndPoint as IPEndPoint);
 			/**
 			 * => cliHeader              6 "NfCli1"
-			 * => byteCount              1 uint8
-			 * => cliLocalAddr <byteCount> string
 			 * => cliTcpPort             2 uint16
 			 * => cliUdpPort             2 uint16
+			 * => byteCount              1 uint8
+			 * => cliLocalAddr <byteCount> string
 			 * <= serHeader              6 "NfSer1"
 			 * <= serUdpPort             2 uint16
 			 */
+			string cliLocalAddrStr = ipAddress.ToString();
+			int byteCount = BitHelper.GetStringByteCount(cliLocalAddrStr);
+			int i = 0;
+			BitHelper.WriteString(service.bufferSnd, ref i, "NfCli1");
+			BitHelper.WriteUInt16(service.bufferSnd, ref i, (ushort)(socket.LocalEndPoint as IPEndPoint).Port);
+			BitHelper.WriteUInt16(service.bufferSnd, ref i, (ushort)(udpSocket.LocalEndPoint as IPEndPoint).Port);
+			BitHelper.WriteUInt8(service.bufferSnd, ref i, (byte)byteCount);
+			BitHelper.WriteString(service.bufferSnd, ref i, cliLocalAddrStr);
+			service.Send(0, i);
+			service.Receive(0, 8);
+			i = 0;
+			string serHeader = BitHelper.ReadString(service.bufferRev, ref i, 6);
+			Log(serHeader);
+			int serUdpPort = BitHelper.ReadUInt16(service.bufferRev, ref i);
+			var remoteUdpEp = new IPEndPoint(ipAddress, serUdpPort);
+			udpSocket.Connect(remoteUdpEp);
+			service.SetRemoteUdpEp(remoteUdpEp);
+
 			Task.Run((System.Action)service.MessageListener);
 			return service;
 		}
