@@ -1,18 +1,20 @@
-﻿using Networkf;
+﻿using System;
+using Networkf;
 
 namespace NetworkfSample {
 	static class MainClass {
 		public static void Main() {
 			NetworkService.ParseMessage = ParseMessage;  // provide ParseMessage
-
-			System.Console.Write("start (server/client)? ");
-			var option = System.Console.ReadLine();
+			Console.InputEncoding = System.Text.Encoding.Unicode;
+			Console.OutputEncoding = System.Text.Encoding.Unicode;
+			Console.Write("start ([s]erver/client): ");
+			var option = Console.ReadLine();
 			if (option.Length > 0 && option[0] == 's') {
 				var server = new SampleServer();
 				NetworkHelper.StartServer(server.OnClientConnected);
-				System.Console.ReadLine();
+				Console.ReadLine();
 			} else {
-				var service = NetworkHelper.StartClient();
+				var service = NetworkHelper.StartClient("s1.dotlab.cc");
 				var client = new SampleClient(service);
 				client.Start();
 			}
@@ -33,7 +35,7 @@ namespace NetworkfSample {
 			case SerChatMessage.KType:
 				return new SerChatMessage(buf, ref i);
 			default:
-				throw new System.NotImplementedException();
+				throw new NotImplementedException();
 			}
 		}
 	}

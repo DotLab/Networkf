@@ -17,12 +17,31 @@ namespace Networkf {
 
 		public const int KServerPort = 11000;
 
-		public static void StartServer(System.Action<NetworkService> onClientConnected = null, int port = KServerPort) {
+		public static IPAddress GetLocalIpAddress() {
 			var ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
-			var ipAddress = ipHostInfo.AddressList[0];
-			var localTcpEp = new IPEndPoint(ipAddress, port);
+			foreach (var address in ipHostInfo.AddressList) {
+				if (address.AddressFamily == AddressFamily.InterNetwork) {
+					return address;
+				}
+			}
+			throw new System.NotSupportedException();
+		}
 
-			var server = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+		public static IPAddress GetRemoteIpAddress(string name) {
+			var ipHostInfo = Dns.GetHostEntry(name);
+			foreach (var address in ipHostInfo.AddressList) {
+				if (address.AddressFamily == AddressFamily.InterNetwork) {
+					return address;
+				}
+			}
+			throw new System.NotSupportedException();
+		}
+
+		public static void StartServer(System.Action<NetworkService> onClientConnected = null, int port = KServerPort) {
+			var localIpAddress = GetLocalIpAddress();
+			var localTcpEp = new IPEndPoint(localIpAddress, port);
+
+			var server = new Socket(localIpAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 			server.Bind(localTcpEp);
 			server.Listen(10);  // backlog is 10
 
@@ -35,8 +54,8 @@ namespace Networkf {
 					
 					Log("new client " + clientIndex);
 					new Thread(() => {
-						var udpClient = new Socket(ipAddress.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
-						udpClient.Bind(new IPEndPoint(ipAddress, 0));
+						var udpClient = new Socket(localIpAddress.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
+						udpClient.Bind(new IPEndPoint(localIpAddress, 0));
 
 						var service = new NetworkService(clientIndex, client, udpClient, localTcpEp, client.RemoteEndPoint as IPEndPoint, udpClient.LocalEndPoint as IPEndPoint);
 
@@ -82,14 +101,15 @@ namespace Networkf {
 		}
 
 		public static NetworkService StartClient(string hostNameOrAddress = "127.0.0.1", int port = KServerPort) {
-			var ipHostInfo = Dns.GetHostEntry(hostNameOrAddress);
-			var ipAddress = ipHostInfo.AddressList[0];
-			var remoteEndPoint = new IPEndPoint(ipAddress, port);
+			var remoteIpAddress = GetRemoteIpAddress(hostNameOrAddress);
+			var remoteEndPoint = new IPEndPoint(remoteIpAddress, port);
 
-			var socket = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+			var socket = new Socket(remoteIpAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 			socket.Connect(remoteEndPoint);
-			var udpSocket = new Socket(ipAddress.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
-			udpSocket.Bind(new IPEndPoint(ipAddress, 0));
+
+			var localIpAddress = GetLocalIpAddress();
+			var udpSocket = new Socket(localIpAddress.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
+			udpSocket.Bind(new IPEndPoint(localIpAddress, 0));
 
 			var service = new NetworkService(-1, socket, udpSocket, socket.LocalEndPoint as IPEndPoint, socket.RemoteEndPoint as IPEndPoint, udpSocket.LocalEndPoint as IPEndPoint);
 			/**
@@ -101,7 +121,7 @@ namespace Networkf {
 			 * <= serHeader              6 "NfSer1"
 			 * <= serUdpPort             2 uint16
 			 */
-			string cliLocalAddrStr = ipAddress.ToString();
+			string cliLocalAddrStr = remoteIpAddress.ToString();
 			int byteCount = BitHelper.GetStringByteCount(cliLocalAddrStr);
 			int i = 0;
 			BitHelper.WriteString(service.bufferSnd, ref i, "NfCli1");
@@ -115,7 +135,7 @@ namespace Networkf {
 			string serHeader = BitHelper.ReadString(service.bufferRev, ref i, 6);
 			Log(serHeader);
 			int serUdpPort = BitHelper.ReadUInt16(service.bufferRev, ref i);
-			var remoteUdpEp = new IPEndPoint(ipAddress, serUdpPort);
+			var remoteUdpEp = new IPEndPoint(remoteIpAddress, serUdpPort);
 			udpSocket.Connect(remoteUdpEp);
 			service.SetRemoteUdpEp(remoteUdpEp);
 
