@@ -29,7 +29,6 @@ namespace NetworkfSample {
 		}
 
 		public override void WriteTo(byte[] buf, ref int i) {
-			base.WriteTo(buf, ref i);
 			BitHelper.WriteInt32(buf, ref i, BitHelper.GetStringByteCount(name));
 			BitHelper.WriteString(buf, ref i, name);
 		}
@@ -53,7 +52,6 @@ namespace NetworkfSample {
 		}
 
 		public override void WriteTo(byte[] buf, ref int i) {
-			base.WriteTo(buf, ref i);
 			BitHelper.WriteInt32(buf, ref i, BitHelper.GetStringByteCount(text));
 			BitHelper.WriteString(buf, ref i, text);
 		}
@@ -82,7 +80,6 @@ namespace NetworkfSample {
 		}
 
 		public override void WriteTo(byte[] buf, ref int i) {
-			base.WriteTo(buf, ref i);
 			BitHelper.WriteInt32(buf, ref i, BitHelper.GetStringByteCount(name));
 			BitHelper.WriteString(buf, ref i, name);
 			BitHelper.WriteInt32(buf, ref i, BitHelper.GetStringByteCount(text));

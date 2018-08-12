@@ -101,6 +101,7 @@ namespace Networkf {
 
 		public int SendMessage(Message message) {
 			int i = KLengthFieldSize;
+			Message.WriteMessageType(_bufferSnd, ref i, message.type);
 			message.WriteTo(_bufferSnd, ref i);
 
 			int contentSize = i - KLengthFieldSize;

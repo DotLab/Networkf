@@ -26,6 +26,22 @@
 			return str;
 		}
 
+		public static float ReadSingle(byte[] buf, ref int i) {
+			float val;
+			if (System.BitConverter.IsLittleEndian) {
+				val = System.BitConverter.ToSingle(buf, i);
+			} else {
+				val = System.BitConverter.ToSingle(new [] {
+					buf[i + 3],
+					buf[i + 2],
+					buf[i + 1],
+					buf[i]
+				}, 0);
+			}
+			i += 4;
+			return val;
+		}
+
 		public static void WriteUInt8(byte[] buf, ref int i, byte val) {
 			buf[i++] = val;
 		}
@@ -54,13 +70,28 @@
 			buf[i++] = (byte)((val >> 24) & 0xFF);
 		}
 
-		public static int GetStringByteCount (string val) {
+		public static int GetStringByteCount(string val) {
 			return System.Text.Encoding.UTF8.GetByteCount(val);
 		}
 
-		public static void WriteString (byte[] buf, ref int i, string val) {
+		public static void WriteString(byte[] buf, ref int i, string val) {
 			int len = System.Text.Encoding.UTF8.GetBytes(val, 0, val.Length, buf, i);
 			i += len;
+		}
+
+		public static void WriteSingle(byte[] buf, ref int i, float val) {
+			var bytes = System.BitConverter.GetBytes(val);
+			if (System.BitConverter.IsLittleEndian) {
+				buf[i++] = bytes[0];
+				buf[i++] = bytes[1];
+				buf[i++] = bytes[2];
+				buf[i++] = bytes[3];
+			} else {
+				buf[i++] = bytes[3];
+				buf[i++] = bytes[2];
+				buf[i++] = bytes[1];
+				buf[i++] = bytes[0];
+			}
 		}
 	}
 }

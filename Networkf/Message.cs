@@ -6,6 +6,9 @@
 		public static int ReadMessageType(byte[] buf, ref int i) {
 			return BitHelper.ReadInt32(buf, ref i);
 		}
+		public static void WriteMessageType(byte[] buf, ref int i, int type) {
+			BitHelper.WriteInt32(buf, ref i, type);
+		}
 
 		public readonly int type;
 
@@ -13,9 +16,7 @@
 			this.type = type;
 		}
 
-		public virtual void WriteTo(byte[] buf, ref int i) {
-			BitHelper.WriteInt32(buf, ref i, type);
-		}
+		public virtual void WriteTo(byte[] buf, ref int i) {}
 	}
 }
 
