@@ -10,7 +10,7 @@
 			BitHelper.WriteInt32(buf, ref i, type);
 		}
 
-		public readonly int type;
+		public int type;
 
 		protected Message(int type) {
 			this.type = type;
