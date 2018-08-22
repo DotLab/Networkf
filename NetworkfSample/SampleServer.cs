@@ -13,8 +13,10 @@ namespace NetworkfSample {
 
 		readonly Dictionary<int, ClientHandler> _clientDict = new Dictionary<int, ClientHandler>();
 
-		public void OnClientConnected(NetworkService service) {
-			var clientHandler = new ClientHandler(this, service);
+		public void OnClientConnected(NetworkService service)
+        {
+            service.ParseMessage = MainClass.ParseMessage;  // provide ParseMessage
+            var clientHandler = new ClientHandler(this, service);
 			_clientDict.Add(service.id, clientHandler);
 			clientHandler.Start();
 		}

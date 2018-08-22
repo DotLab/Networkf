@@ -14,7 +14,7 @@ namespace Networkf {
 		}
 
 		public const int KBufferSize = 2048, KLengthFieldSize = 2, KCrc32FieldSize = 4, KContentMaxSize = KBufferSize - KLengthFieldSize - KCrc32FieldSize;
-		public static ParseMessageDelegate ParseMessage;
+		public ParseMessageDelegate ParseMessage;
 
 		public readonly int id;
 		public readonly Socket socket;
