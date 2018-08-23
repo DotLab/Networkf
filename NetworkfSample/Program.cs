@@ -16,6 +16,7 @@ namespace NetworkfSample {
 				var server = new SampleServer();
 				NetworkHelper.StartServer(server.OnClientConnected);
 				var service = NetworkHelper.StartClient("127.0.0.1");
+				service.parseMessage = ParseMessage;
 				var client = new SampleClient(service);
 				client.Start();
 			} else {
