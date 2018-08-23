@@ -4,7 +4,6 @@ using Networkf;
 namespace NetworkfSample {
 	static class MainClass {
 		public static void Main() {
-			NetworkService.ParseMessage = ParseMessage;  // provide ParseMessage
 			Console.InputEncoding = System.Text.Encoding.Unicode;
 			Console.OutputEncoding = System.Text.Encoding.Unicode;
 			Console.Write("start ([s]erver/client): ");
@@ -15,12 +14,13 @@ namespace NetworkfSample {
 				Console.ReadLine();
 			} else {
 				var service = NetworkHelper.StartClient("s1.dotlab.cc");
+				service.ParseMessage = ParseMessage;  // provide ParseMessage
 				var client = new SampleClient(service);
 				client.Start();
 			}
 		}
 
-		static Message ParseMessage(byte[] buf, ref int i) {
+		public static Message ParseMessage(byte[] buf, ref int i) {
 			var type = Message.ReadMessageType(buf, ref i);
 			switch (type) {
 			case CltHelloMessage.KType:
