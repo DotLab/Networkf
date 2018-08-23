@@ -20,7 +20,7 @@ namespace NetworkfSample {
 				client.Start();
 			} else {
 				var service = NetworkHelper.StartClient("s1.dotlab.cc");
-				service.ParseMessage = ParseMessage;  // provide ParseMessage
+				service.parseMessage = ParseMessage;  // provide ParseMessage
 				var client = new SampleClient(service);
 				client.Start();
 			}

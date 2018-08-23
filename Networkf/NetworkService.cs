@@ -14,7 +14,7 @@ namespace Networkf {
 		}
 
 		public const int KBufferSize = 2048, KLengthFieldSize = 2, KCrc32FieldSize = 4, KContentMaxSize = KBufferSize - KLengthFieldSize - KCrc32FieldSize;
-		public ParseMessageDelegate ParseMessage;
+		public ParseMessageDelegate parseMessage;
 
 		public readonly int id;
 		public readonly Socket socket;
@@ -86,9 +86,9 @@ namespace Networkf {
 					break;
 				}
 
-				if (ParseMessage != null) {
+				if (parseMessage != null) {
 					int messageI = KLengthFieldSize;
-					var message = ParseMessage(bufferRev, ref messageI);
+					var message = parseMessage(bufferRev, ref messageI);
 					if (messageI != i - KCrc32FieldSize) {
 						Log("\t\terror: message used {0}, expecting {1}", messageI, i - KCrc32FieldSize);
 						break;
