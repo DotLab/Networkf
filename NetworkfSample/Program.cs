@@ -14,8 +14,8 @@ namespace NetworkfSample {
 				Console.ReadLine();
 			} else {
 				var service = NetworkHelper.StartClient("s1.dotlab.cc");
-                service.ParseMessage = ParseMessage;  // provide ParseMessage
-                var client = new SampleClient(service);
+				service.ParseMessage = ParseMessage;  // provide ParseMessage
+				var client = new SampleClient(service);
 				client.Start();
 			}
 		}
