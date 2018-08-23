@@ -39,7 +39,9 @@ namespace NetworkfSample {
 			public string name;
 
 			void Log(string str) {
+				#if DEBUG
 				System.Console.WriteLine("server {0,3}: " + str, service.id);
+				#endif
 			}
 
 			public ClientHandler(SampleServer server, NetworkService service) {

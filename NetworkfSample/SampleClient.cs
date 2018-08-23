@@ -58,8 +58,20 @@ namespace NetworkfSample {
 
 			Console.WriteLine("Happy chating, " + name + "!");
 			while (true) {
-				string text = Console.ReadLine();
-				service.SendMessage(new CltChatMessage(text));
+				string text = Console.ReadLine().Trim();
+				if (string.IsNullOrEmpty(text)) {
+					continue;
+				}
+
+				if (text == "?") {
+					Console.WriteLine(
+						">l      - list all online user\n" +
+						">p [id] - start p2p chat with [id]"
+					);
+				} else if (text[0] == '>') {  // command
+				} else {
+					service.SendMessage(new CltChatMessage(text));
+				}
 			}
 		}
 	}

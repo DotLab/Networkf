@@ -1,4 +1,5 @@
 ﻿using Networkf;
+using Bit = Networkf.BitHelper;
 
 namespace NetworkfSample {
 	public sealed class SerHelloMessage : Message {
@@ -20,17 +21,17 @@ namespace NetworkfSample {
 		}
 
 		/**
-		 * byteCount      4 int32  // NOT text.Length
+		 * len      4 int32  // NOT text.Length
 		 * text       <len> string
 		 */
 		public CltSetNameMessage(byte[] buf, ref int i) : base(KType) {
-			int byteCount = BitHelper.ReadInt32(buf, ref i);
-			name = BitHelper.ReadString(buf, ref i, byteCount);
+			int len = Bit.ReadInt32(buf, ref i);
+			name = Bit.ReadString(buf, ref i, len);
 		}
 
 		public override void WriteTo(byte[] buf, ref int i) {
-			BitHelper.WriteInt32(buf, ref i, BitHelper.GetStringByteCount(name));
-			BitHelper.WriteString(buf, ref i, name);
+			Bit.WriteInt32(buf, ref i, Bit.GetStringByteCount(name));
+			Bit.WriteString(buf, ref i, name);
 		}
 	}
 
@@ -43,17 +44,17 @@ namespace NetworkfSample {
 		}
 
 		/**
-		 * byteCount      4 int32  // NOT text.Length
+		 * len      4 int32  // NOT text.Length
 		 * text       <len> string
 		 */
 		public CltChatMessage(byte[] buf, ref int i) : base(KType) {
-			int byteCount = BitHelper.ReadInt32(buf, ref i);
-			text = BitHelper.ReadString(buf, ref i, byteCount);
+			int len = Bit.ReadInt32(buf, ref i);
+			text = Bit.ReadString(buf, ref i, len);
 		}
 
 		public override void WriteTo(byte[] buf, ref int i) {
-			BitHelper.WriteInt32(buf, ref i, BitHelper.GetStringByteCount(text));
-			BitHelper.WriteString(buf, ref i, text);
+			Bit.WriteInt32(buf, ref i, Bit.GetStringByteCount(text));
+			Bit.WriteString(buf, ref i, text);
 		}
 	}
 
@@ -67,23 +68,23 @@ namespace NetworkfSample {
 		}
 
 		/**
-		 * byteCount      4 int32  // NOT text.Length
+		 * len      4 int32  // NOT text.Length
 		 * name       <len> string
-		 * byteCount      4 int32  // NOT text.Length
+		 * len      4 int32  // NOT text.Length
 		 * text       <len> string
 		 */
 		public SerChatMessage(byte[] buf, ref int i) : base(KType) {
-			int byteCount = BitHelper.ReadInt32(buf, ref i);
-			name = BitHelper.ReadString(buf, ref i, byteCount);
-			byteCount = BitHelper.ReadInt32(buf, ref i);
-			text = BitHelper.ReadString(buf, ref i, byteCount);
+			int len = Bit.ReadInt32(buf, ref i);
+			name = Bit.ReadString(buf, ref i, len);
+			len = Bit.ReadInt32(buf, ref i);
+			text = Bit.ReadString(buf, ref i, len);
 		}
 
 		public override void WriteTo(byte[] buf, ref int i) {
-			BitHelper.WriteInt32(buf, ref i, BitHelper.GetStringByteCount(name));
-			BitHelper.WriteString(buf, ref i, name);
-			BitHelper.WriteInt32(buf, ref i, BitHelper.GetStringByteCount(text));
-			BitHelper.WriteString(buf, ref i, text);
+			Bit.WriteInt32(buf, ref i, Bit.GetStringByteCount(name));
+			Bit.WriteString(buf, ref i, name);
+			Bit.WriteInt32(buf, ref i, Bit.GetStringByteCount(text));
+			Bit.WriteString(buf, ref i, text);
 		}
 	}
 }

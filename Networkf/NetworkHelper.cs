@@ -100,7 +100,7 @@ namespace Networkf {
 			});
 		}
 
-		public static NetworkService StartClient(string hostNameOrAddress = "127.0.0.1", int port = KServerPort) {
+		public static NetworkService StartClient(string hostNameOrAddress, int port = KServerPort) {
 			var remoteIpAddress = GetRemoteIpAddress(hostNameOrAddress);
 			var remoteEndPoint = new IPEndPoint(remoteIpAddress, port);
 

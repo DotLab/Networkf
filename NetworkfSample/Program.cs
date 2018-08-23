@@ -7,12 +7,18 @@ namespace NetworkfSample {
 			NetworkService.ParseMessage = ParseMessage;  // provide ParseMessage
 			Console.InputEncoding = System.Text.Encoding.Unicode;
 			Console.OutputEncoding = System.Text.Encoding.Unicode;
-			Console.Write("start ([s]erver/client): ");
+			Console.Write("start ([s]erver/client/[l]ocal): ");
 			var option = Console.ReadLine();
 			if (option.Length > 0 && option[0] == 's') {
 				var server = new SampleServer();
 				NetworkHelper.StartServer(server.OnClientConnected);
 				Console.ReadLine();
+			} else if (option.Length > 0 && option[0] == 'l') {
+				var server = new SampleServer();
+				NetworkHelper.StartServer(server.OnClientConnected);
+				var service = NetworkHelper.StartClient("127.0.0.1");
+				var client = new SampleClient(service);
+				client.Start();
 			} else {
 				var service = NetworkHelper.StartClient("s1.dotlab.cc");
 				var client = new SampleClient(service);
