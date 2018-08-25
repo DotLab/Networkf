@@ -86,33 +86,20 @@ namespace Networkf {
 					break;
 				}
 
-				try {
-					if (parseMessage != null) {
-						int messageI = KLengthFieldSize;
-						var message = parseMessage(bufferRev, ref messageI);
-						if (messageI != i - KCrc32FieldSize) {
-							Log("\t\terror: message used {0}, expecting {1}", messageI, i - KCrc32FieldSize);
-							break;
-						}
-						Log("\t\treceived message type {0}", message.type);
-
-						if (OnMessageReceived != null) {
-							OnMessageReceived(id, message);
-						}
+				if (parseMessage != null) {
+					int messageI = KLengthFieldSize;
+					var message = parseMessage(bufferRev, ref messageI);
+					if (messageI != i - KCrc32FieldSize) {
+						Log("\t\terror: message used {0}, expecting {1}", messageI, i - KCrc32FieldSize);
+						break;
 					}
-				} catch (System.Exception e) {
-					Log(e.Message);
-					break;
+					Log("\t\treceived message type {0}", message.type);
+					
+					if (OnMessageReceived != null) {
+						OnMessageReceived(id, message);
+					}
 				}
-
 			}
-
-			TeardownService();
-		}
-
-		public void TeardownService() {
-			socket.Shutdown(SocketShutdown.Both);
-			socket.Close();
 
 			if (OnServiceTeardown != null) {
 				OnServiceTeardown();
