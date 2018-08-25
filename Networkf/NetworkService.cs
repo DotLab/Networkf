@@ -13,7 +13,7 @@ namespace Networkf {
 			Log(string.Format(format, args));
 		}
 
-		public const int KBufferSize = 4096, KLengthFieldSize = 2, KCrc32FieldSize = 4, KContentMaxSize = KBufferSize - KLengthFieldSize - KCrc32FieldSize;
+		public const int KBufferSize = 2048, KLengthFieldSize = 2, KCrc32FieldSize = 4, KContentMaxSize = KBufferSize - KLengthFieldSize - KCrc32FieldSize;
 		public ParseMessageDelegate parseMessage;
 
 		public readonly int id;
